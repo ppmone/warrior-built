@@ -15,6 +15,7 @@ import {
     disableNetwork
 } from 'firebase/firestore';
 
+import { loadStripe } from '@stripe/stripe-js';
 import { Container, Box } from '@mui/material';
 import LoadingOverlay from './components/common/LoadingOverlay';
 import StatusMessage from './components/common/StatusMessage';
@@ -24,6 +25,11 @@ import Layout from './components/layout/Layout';
 import FreeContent from './components/content/FreeContent';
 import GatedContent from './components/content/GatedContent';
 import UserInfo from './components/ui/UserInfo';
+
+// reCAPTCHA Import
+import ReCAPTCHA from "react-google-recaptcha";
+
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyCRRkdqKL-G1lMMPeHWna4W7B4afOXlFrs",
@@ -35,8 +41,25 @@ const firebaseConfig = {
     measurementId: "G-8WJ8ZBFY65"
 };
 
+
+// Initialize Firebase outside of the component to avoid re-initialization
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+// Use the Firebase Project ID as the application identifier for Firestore paths
+const APP_IDENTIFIER = firebaseConfig.projectId;
+
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+// === Stripe Configuration (Frontend) ===
+const STRIPE_PUBLISHABLE_KEY = 'YOUR_STRIPE_PUBLISHABLE_KEY';
+const BACKEND_URL = 'YOUR_BACKEND_SERVER_URL';
+
+// === reCAPTCHA Configuration (Frontend) ===
+// IMPORTANT: Replace with your actual reCAPTCHA v2 "I'm not a robot" checkbox Site Key
+const RECAPTCHA_SITE_KEY = '6LeHd44rAAAAANfZtpJLSvvRNLWkwas6jh22U0mW';
+
+let stripePromise; // To load Stripe.js only once
 
 const App = () => {
     const [userId, setUserId] = useState(null);
