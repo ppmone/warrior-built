@@ -49,7 +49,7 @@ const Header = ({ userId, isSubscribed, onSignOut }) => {
                         }}
                     >
                         <img 
-                            src="./public/atlas-50.png" 
+                            src="/atlas-50.png" 
                             alt="Warrior Built Logo" 
                             style={{ 
                                 width: '80px', 
