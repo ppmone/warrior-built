@@ -17,7 +17,7 @@ const App = () => {
     const [statusMessage, setStatusMessage] = useState('Loading...');
     const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
-    const BACKEND_URL = 'http://localhost:8080/api';
+    const BACKEND_URL = 'http://localhost:5000/api';
 
     // Fetch subscription status from the backend
     const fetchSubscriptionStatus = async (userId) => {
@@ -28,18 +28,18 @@ const App = () => {
                 setIsSubscribed(data.isSubscribed);
                 setStatusMessage(
                     data.isSubscribed
-                        ? 'Premium content unlocked!'
-                        : 'Subscribe to unlock premium content'
+                        ? "Premium content unlocked!"
+                        : "Subscribe to unlock premium content"
                 );
             } else {
-                console.error('Failed to fetch subscription status');
+                console.error("Failed to fetch subscription status");
                 setIsSubscribed(false);
-                setStatusMessage('Subscribe to unlock premium content');
+                setStatusMessage("Subscribe to unlock premium content");
             }
         } catch (error) {
-            console.error('Error fetching subscription status:', error);
+            console.error("Error fetching subscription status:", error);
             setIsSubscribed(false);
-            setStatusMessage('Unable to check subscription status');
+            setStatusMessage("Unable to check subscription status");
         } finally {
             setIsSubscriptionLoading(false);
         }
@@ -49,17 +49,17 @@ const App = () => {
     const createUserInBackend = async (userId, email) => {
         try {
             const response = await fetch(`${BACKEND_URL}/users`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: userId, email }),
             });
             if (response.ok) {
-                console.log('User created successfully');
+                console.log("User created successfully");
             } else {
-                console.error('Failed to create user');
+                console.error("Failed to create user");
             }
         } catch (error) {
-            console.error('Error creating user:', error);
+            console.error("Error creating user:", error);
         }
     };
 
@@ -79,8 +79,7 @@ const App = () => {
         <Box className="fade-in" sx={{ minHeight: '100vh', bgcolor: '#f0f2f5' }}>
             <LoadingOverlay loading={loading} />
             <Header userId={userId} isSubscribed={isSubscribed} />
-            <Box sx={{ paddingTop: '100px' }}>
-                <Carousel />
+            <Box sx={{ paddingTop: '100px', display: 'flex', justifyContent: 'center' }}>
                 <Layout>
                     <Container maxWidth="md" className="container">
                         <StatusMessage message={statusMessage} />

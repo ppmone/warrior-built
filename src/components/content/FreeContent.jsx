@@ -7,10 +7,11 @@ const FreeContent = () => {
             <Container 
                 maxWidth={false} 
                 sx={{ 
-                    maxWidth: '100%', 
+                    maxWidth: '80%', // Reduce container width
                     px: 3,
                     margin: '0 auto',
-                    width: '100%'
+                    display: 'flex',
+                    justifyContent: 'center', // Center content horizontally
                 }}
             >
                 <Paper elevation={3} className="card fade-in" sx={{ width: '100%', margin: 0 }}>
