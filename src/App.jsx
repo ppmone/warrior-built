@@ -3,7 +3,6 @@ import { Container, Box } from '@mui/material';
 import LoadingOverlay from './components/common/LoadingOverlay';
 import StatusMessage from './components/common/StatusMessage';
 import Header from './components/layout/Header';
-import Carousel from './components/carousel/Carousel';
 import Layout from './components/layout/Layout';
 import FreeContent from './components/content/FreeContent';
 import GatedContent from './components/content/GatedContent';
@@ -17,7 +16,7 @@ const App = () => {
     const [statusMessage, setStatusMessage] = useState('Loading...');
     const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
-    const BACKEND_URL = 'http://localhost:5000/api';
+    const BACKEND_URL = 'http://localhost:5001/api';
 
     // Fetch subscription status from the backend
     const fetchSubscriptionStatus = async (userId) => {
@@ -63,6 +62,18 @@ const App = () => {
         }
     };
 
+    // Handle sign out
+    const handleSignOut = () => {
+        // Reset user state
+        setUserId(null);
+        setIsSubscribed(false);
+        setIsAuthReady(false);
+        setStatusMessage("Sign in to access content");
+        setIsSubscriptionLoading(false);
+        
+        console.log("User signed out successfully");
+    };
+
     // Simulate user authentication (replace with actual auth logic)
     useEffect(() => {
         const mockUserId = 'user1'; // Replace with actual user ID from authentication
@@ -78,7 +89,11 @@ const App = () => {
     return (
         <Box className="fade-in" sx={{ minHeight: '100vh', bgcolor: '#f0f2f5' }}>
             <LoadingOverlay loading={loading} />
-            <Header userId={userId} isSubscribed={isSubscribed} />
+            <Header 
+                userId={userId} 
+                isSubscribed={isSubscribed} 
+                onSignOut={handleSignOut}
+            />
             <Box sx={{ paddingTop: '100px', display: 'flex', justifyContent: 'center' }}>
                 <Layout>
                     <Container maxWidth="md" className="container">

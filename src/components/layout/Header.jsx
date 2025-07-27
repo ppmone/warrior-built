@@ -1,9 +1,13 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 
-const Header = ({ userId, isSubscribed }) => {
+const Header = ({ userId, isSubscribed, onSignOut }) => {
     const handleSignOut = () => {
-        console.log('Sign out logic here'); // Replace with actual sign-out logic
+        // Call the parent component's sign out function
+        if (onSignOut) {
+            onSignOut();
+        }
+        console.log('User signed out');
     };
 
     return (
@@ -64,12 +68,7 @@ const Header = ({ userId, isSubscribed }) => {
                         {isSubscribed ? 'Premium Content Platform' : 'Free Content Platform'}
                     </Typography>
                 )}
- 
- 
 
- 
- {/* */}
- 
                 <Button 
                     variant="outlined" 
                     className="btn btn-secondary"
