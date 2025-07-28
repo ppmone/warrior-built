@@ -94,9 +94,22 @@ const App = () => {
                 isSubscribed={isSubscribed} 
                 onSignOut={handleSignOut}
             />
-            <Box sx={{ paddingTop: '100px', display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ 
+                paddingTop: '100px', 
+                display: 'flex', 
+                justifyContent: 'flex-start', // Changed from 'center' to 'flex-start'
+                width: '100%'
+            }}>
                 <Layout>
-                    <Container maxWidth="md" className="container">
+                    <Container 
+                        maxWidth="lg" // Changed from "md" to "lg" for wider content
+                        sx={{ 
+                            paddingLeft: '24px', // Add left padding
+                            paddingRight: '24px',
+                            width: '100%'
+                        }}
+                        className="container"
+                    >
                         <StatusMessage message={statusMessage} />
                         <UserInfo userId={userId} />
                         {isSubscriptionLoading ? (
