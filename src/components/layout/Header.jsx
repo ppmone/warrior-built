@@ -1,83 +1,96 @@
+// ----------------------------------------------------------------------
+// warrior-built/src/components/Header.jsx (CORRECTED)
+// ----------------------------------------------------------------------
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { getAuth, signOut } from 'firebase/auth';
+import { logout } from '../../features/auth/authSlice';
 
-const Header = ({ userId, isSubscribed, onSignOut }) => {
-    const handleSignOut = () => {
-        // Call the parent component's sign out function
-        if (onSignOut) {
-            onSignOut();
-        }
-        console.log('User signed out');
-    };
+function Header({ onLoginClick }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
-    return (
-        <AppBar
-            position="fixed"
-            className="header"
+  const onLogout = () => {
+    const auth = getAuth();
+    signOut(auth);
+    dispatch(logout());
+    navigate('/');
+  };
+
+  return (
+    <AppBar
+        position="fixed"
+        className="header"
+        sx={{
+            boxShadow: 'none',
+            mb: 0,
+            zIndex: (theme) => theme.zIndex.appBar,
+            top: 0,
+            left: 0,
+            right: 0,
+        }}
+        >
+        <Toolbar
+            className="flex-between"
             sx={{
-                boxShadow: 'none',
-                mb: 0,
-                zIndex: (theme) => theme.zIndex.appBar,
-                top: 0,
-                left: 0,
-                right: 0,
+                height: '100px',
+                alignItems: 'center',
+                padding: '0 24px',
             }}
         >
-            <Toolbar
-                className="flex-between"
+        <Box
+            className="flex"
+            sx={{
+                alignItems: 'center',
+                gap: 1,
+                height: '100%',
+            }}
+        >
+            <img
+                src="/atlas-50.png"
+                alt="Warrior Built Logo"
+                style={{
+                    width: '80px',
+                    height: '80px',
+                    objectFit: 'contain',
+                }}
+            />
+            <Typography
+                variant="h5"
+                component="h1"
+                className="text-secondary-light"
                 sx={{
-                    height: '100px',
+                    fontWeight: 'bold',
+                    color: 'white',
+                    display: 'flex',
                     alignItems: 'center',
-                    padding: '0 24px',
                 }}
             >
-                <Box
-                    className="flex"
-                    sx={{
-                        alignItems: 'center',
-                        gap: 1,
-                        height: '100%',
-                    }}
-                >
-                    <img
-                        src="/atlas-50.png"
-                        alt="Warrior Built Logo"
-                        style={{
-                            width: '80px',
-                            height: '80px',
-                            objectFit: 'contain',
-                        }}
-                    />
-                    <Typography
-                        variant="h5"
-                        component="h1"
-                        className="text-secondary-light"
-                        sx={{
-                            fontWeight: 'bold',
-                            color: 'white',
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        Warrior Built
-                    </Typography>
-                </Box>
-
-                {userId && (
-                    <Typography variant="body1" sx={{ marginRight: 2 }}>
-                        {isSubscribed ? 'Premium Content Platform' : 'Free Content Platform'}
-                    </Typography>
-                )}
-
-                <Button 
-                    variant="outlined" 
-                    className="btn btn-secondary"
-                    onClick={handleSignOut}>
-                    {userId ? 'Sign Out' : 'Sign In'}
+                Warrior Built
+            </Typography>
+        </Box>
+        <Box>
+            {user ? (
+                <Button className="btn btn-secondary" color="inherit" onClick={onLogout}>
+                Logout
                 </Button>
-            </Toolbar>
-        </AppBar>
-    );
-};
+            ) : (
+                <>
+                <Button className="btn btn-secondary" color="inherit" onClick={onLoginClick}>
+                    Login
+                </Button>
+                <Button className="btn btn-secondary" variant="contained" onClick={onLoginClick} sx={{ ml: 2 }}>
+                    Sign Up
+                </Button>
+                </>
+            )}
+            </Box>
+        </Toolbar>
+    </AppBar>
+  );
+}
 
 export default Header;

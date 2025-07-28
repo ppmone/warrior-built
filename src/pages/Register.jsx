@@ -1,20 +1,22 @@
-// warrior-built/src/pages/Login.jsx
+// warrior-built/src/pages/Register.jsx
 
 import React, { useState, useEffect } from 'react';
-import { FaSignInAlt, FaGoogle } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { login, reset } from '../features/auth/authSlice';
+import { FaUser } from 'react-icons/fa';
+import { register, reset } from '../features/auth/authSlice';
 import Spinner from '../components/Spinner';
 
-function Login() {
+function Register() {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    password2: '',
   });
 
-  const { email, password } = formData;
+  const { name, email, password, password2 } = formData;
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,7 +30,6 @@ function Login() {
       toast.error(message);
     }
 
-    // Redirect when logged in
     if (isSuccess || user) {
       navigate('/');
     }
@@ -46,17 +47,17 @@ function Login() {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    const userData = {
-      email,
-      password,
-    };
+    if (password !== password2) {
+      toast.error('Passwords do not match');
+    } else {
+      const userData = {
+        name,
+        email,
+        password,
+      };
 
-    dispatch(login(userData));
-  };
-
-  const onGoogleClick = () => {
-    // Redirect to the backend Google OAuth route
-    window.location.href = '/api/users/google';
+      dispatch(register(userData));
+    }
   };
 
   if (isLoading) {
@@ -67,13 +68,24 @@ function Login() {
     <>
       <section className='heading'>
         <h1>
-          <FaSignInAlt /> Login
+          <FaUser /> Register
         </h1>
-        <p>Login to access your content</p>
+        <p>Please create an account</p>
       </section>
 
       <section className='form'>
         <form onSubmit={onSubmit}>
+          <div className='form-group'>
+            <input
+              type='text'
+              className='form-control'
+              id='name'
+              name='name'
+              value={name}
+              placeholder='Enter your name'
+              onChange={onChange}
+            />
+          </div>
           <div className='form-group'>
             <input
               type='email'
@@ -83,7 +95,6 @@ function Login() {
               value={email}
               placeholder='Enter your email'
               onChange={onChange}
-              required
             />
           </div>
           <div className='form-group'>
@@ -95,25 +106,28 @@ function Login() {
               value={password}
               placeholder='Enter password'
               onChange={onChange}
-              required
             />
           </div>
-
+          <div className='form-group'>
+            <input
+              type='password'
+              className='form-control'
+              id='password2'
+              name='password2'
+              value={password2}
+              placeholder='Confirm password'
+              onChange={onChange}
+            />
+          </div>
           <div className='form-group'>
             <button type='submit' className='btn btn-block'>
-              Login
+              Submit
             </button>
           </div>
         </form>
-        
-        <div style={{ textAlign: 'center', margin: '1rem 0' }}>OR</div>
-
-        <button className='btn btn-block btn-google' onClick={onGoogleClick}>
-          <FaGoogle style={{ marginRight: '8px' }} /> Sign In with Google
-        </button>
       </section>
     </>
   );
 }
 
-export default Login;
+export default Register;

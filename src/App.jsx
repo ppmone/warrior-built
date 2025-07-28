@@ -1,129 +1,66 @@
+// warrior-built/src/App.js
 import React, { useState, useEffect } from 'react';
-import { Container, Box } from '@mui/material';
-import LoadingOverlay from './components/common/LoadingOverlay';
-import StatusMessage from './components/common/StatusMessage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { Container, Box } from '@mui/material'
 import Header from './components/layout/Header';
+import Carousel from './components/carousel/Carousel';
 import Layout from './components/layout/Layout';
-import FreeContent from './components/content/FreeContent';
-import GatedContent from './components/content/GatedContent';
-import UserInfo from './components/ui/UserInfo';
+import Dashboard from './pages/Dashboard';
+import GatedContent from './pages/GatedContent';
+import FreeContent from './pages/FreeContent';
+import PrivateRoute from './components/PrivateRoute';
+import AuthModal from './components/auth/AuthModal';
+import { setUser, clearUser } from './features/auth/authSlice';
 
-const App = () => {
-    const [userId, setUserId] = useState(null);
-    const [isSubscribed, setIsSubscribed] = useState(false);
-    const [isAuthReady, setIsAuthReady] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [statusMessage, setStatusMessage] = useState('Loading...');
-    const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
+function App() {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const dispatch = useDispatch();
+  const auth = getAuth();
 
-    const BACKEND_URL = 'http://localhost:5001/api';
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        dispatch(
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+          })
+        );
+        setAuthModalOpen(false);
+      } else {
+        dispatch(clearUser());
+      }
+    });
 
-    // Fetch subscription status from the backend
-    const fetchSubscriptionStatus = async (userId) => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/users/${userId}/subscription`);
-            if (response.ok) {
-                const data = await response.json();
-                setIsSubscribed(data.isSubscribed);
-                setStatusMessage(
-                    data.isSubscribed
-                        ? "Premium content unlocked!"
-                        : "Subscribe to unlock premium content"
-                );
-            } else {
-                console.error("Failed to fetch subscription status");
-                setIsSubscribed(false);
-                setStatusMessage("Subscribe to unlock premium content");
-            }
-        } catch (error) {
-            console.error("Error fetching subscription status:", error);
-            setIsSubscribed(false);
-            setStatusMessage("Unable to check subscription status");
-        } finally {
-            setIsSubscriptionLoading(false);
-        }
-    };
+    return () => unsubscribe();
+  }, [auth, dispatch]);
 
-    // Create a new user in the backend
-    const createUserInBackend = async (userId, email) => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/users`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: userId, email }),
-            });
-            if (response.ok) {
-                console.log("User created successfully");
-            } else {
-                console.error("Failed to create user");
-            }
-        } catch (error) {
-            console.error("Error creating user:", error);
-        }
-    };
-
-    // Handle sign out
-    const handleSignOut = () => {
-        // Reset user state
-        setUserId(null);
-        setIsSubscribed(false);
-        setIsAuthReady(false);
-        setStatusMessage("Sign in to access content");
-        setIsSubscriptionLoading(false);
-        
-        console.log("User signed out successfully");
-    };
-
-    // Simulate user authentication (replace with actual auth logic)
-    useEffect(() => {
-        const mockUserId = 'user1'; // Replace with actual user ID from authentication
-        const mockEmail = 'user1@example.com'; // Replace with actual email from authentication
-
-        setUserId(mockUserId);
-        createUserInBackend(mockUserId, mockEmail);
-        fetchSubscriptionStatus(mockUserId);
-        setIsAuthReady(true);
-        setLoading(false);
-    }, []);
-
-    return (
-        <Box className="fade-in" sx={{ minHeight: '100vh', bgcolor: '#f0f2f5' }}>
-            <LoadingOverlay loading={loading} />
-            <Header 
-                userId={userId} 
-                isSubscribed={isSubscribed} 
-                onSignOut={handleSignOut}
-            />
-            <Box sx={{ 
-                paddingTop: '100px', 
-                display: 'flex', 
-                justifyContent: 'flex-start', // Changed from 'center' to 'flex-start'
-                width: '100%'
-            }}>
-                <Layout>
-                    <Container 
-                        maxWidth="lg" // Changed from "md" to "lg" for wider content
-                        sx={{ 
-                            paddingLeft: '24px', // Add left padding
-                            paddingRight: '24px',
-                            width: '100%'
-                        }}
-                        className="container"
-                    >
-                        <StatusMessage message={statusMessage} />
-                        <UserInfo userId={userId} />
-                        {isSubscriptionLoading ? (
-                            <p>Loading subscription status...</p>
-                        ) : userId && isSubscribed ? (
-                            <GatedContent />
-                        ) : (
-                            <FreeContent />
-                        )}
-                    </Container>
-                </Layout>
-            </Box>
+  return (
+    <>
+      <Router>
+        {/* The Container component has been removed from here */}
+        <Header onLoginClick={() => setAuthModalOpen(true)} />
+        <Box sx={{ paddingTop: '100px' }}>
+          <Carousel />
         </Box>
-    );
-};
+            <Routes>
+            <Route path='/' element={<FreeContent />} />
+            <Route path='/free-content' element={<FreeContent />} />
+            
+            <Route path='/gated-content' element={<PrivateRoute />}>
+                <Route path='/gated-content' element={<GatedContent />} />
+            </Route>
+            </Routes>
+        </Router>
+        <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+        <ToastContainer />
+    </>
+  );
+}
 
 export default App;
